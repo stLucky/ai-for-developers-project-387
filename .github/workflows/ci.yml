@@ -48,8 +48,19 @@ jobs:
       - name: Frontend type-check
         run: cd frontend && npm run type-check
 
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(cd frontend && npx playwright --version | awk '{print $2}')" >> $GITHUB_OUTPUT
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ steps.playwright-version.outputs.version }}-chromium
+
       - name: Install Playwright browsers
-        run: cd frontend && npx playwright install --with-deps
+        run: cd frontend && npx playwright install --with-deps chromium
 
       - name: Run E2E tests
         run: cd frontend && npm run test:e2e
