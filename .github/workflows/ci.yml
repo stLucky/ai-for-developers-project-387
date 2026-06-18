@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  ci:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+            backend/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install backend dependencies
+        run: npm run backend:install
+
+      - name: Install frontend dependencies
+        run: npm run frontend:install
+
+      - name: Compile TypeSpec
+        run: npx tsp compile . --emit=@typespec/openapi3
+
+      - name: Generate API types
+        run: npm run api:generate
+
+      - name: Backend type-check
+        run: cd backend && npm run type-check
+
+      - name: Frontend lint
+        run: cd frontend && npm run lint
+
+      - name: Frontend type-check
+        run: cd frontend && npm run type-check
+
+      - name: Install Playwright browsers
+        run: cd frontend && npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: cd frontend && npm run test:e2e

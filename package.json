@@ -1,0 +1,29 @@
+{
+  "name": "call-booking",
+  "version": "1.1.0",
+  "description": "TypeSpec specification for Call Booking service",
+  "scripts": {
+    "prism": "prism mock tsp-output/@typespec/openapi3/openapi.yaml --port 4010",
+    "frontend:install": "cd frontend && npm install",
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "api:generate": "cd frontend && npx openapi-typescript ../tsp-output/@typespec/openapi3/openapi.yaml -o ./src/api/generated.ts",
+    "backend:install": "cd backend && npm install",
+    "backend:dev": "cd backend && npm run dev",
+    "backend:build": "cd backend && npm run build",
+    "backend:start": "cd backend && npm run start",
+    "test:e2e": "cd frontend && npm run test:e2e"
+  },
+  "dependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/http": "latest",
+    "@typespec/rest": "latest",
+    "@typespec/openapi3": "latest"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@stoplight/prism-cli": "latest"
+  }
+}
