@@ -31,3 +31,9 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         with:
           model: opencode/kimi-k2.6
+          prompt: |
+            When fixing issues or making any code changes, use Conventional Commits for ALL commit messages.
+            Format: <type>[optional scope]: <description>
+            - fix: for bug fixes, feat: for features, refactor: for refactoring
+            - Description: lowercase, imperative mood, no trailing period
+            - Example: fix(auth): handle null token on login
