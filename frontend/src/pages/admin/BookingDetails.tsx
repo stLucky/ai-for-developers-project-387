@@ -1,10 +1,9 @@
-import { useBooking, useCancelBooking, useRestoreBooking, useSlot, useEventType } from "@/api/hooks";
+import { useBooking, useCancelBooking, useRestoreBooking, useSlot, useEventType, useOwner } from "@/api/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { format } from "date-fns";
-import { ru } from "date-fns/locale";
+import { formatInTimeZone } from "@/lib/utils";
 import { FileText, User, Mail, CheckCircle2, XCircle, Calendar, AlertTriangle, ArrowLeft, Clock, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -13,6 +12,7 @@ export function BookingDetails() {
   const { data: booking, isLoading } = useBooking(id || "");
   const { data: slot } = useSlot(booking?.slotId || "");
   const { data: eventType } = useEventType(slot?.eventTypeId || "");
+  const { data: owner } = useOwner();
   const cancelBooking = useCancelBooking();
   const restoreBooking = useRestoreBooking();
 
@@ -118,7 +118,7 @@ export function BookingDetails() {
                 <div>
                   <div className="text-xs text-muted-foreground">Дата и время</div>
                   <div className="font-medium">
-                    {format(new Date(slot.startTime), "dd.MM.yyyy HH:mm", { locale: ru })} – {format(new Date(slot.endTime), "HH:mm", { locale: ru })}
+                    {formatInTimeZone(slot.startTime, owner?.timezone ?? "UTC", "dd.MM.yyyy HH:mm")} – {formatInTimeZone(slot.endTime, owner?.timezone ?? "UTC", "HH:mm")}
                   </div>
                 </div>
               </div>
@@ -127,7 +127,7 @@ export function BookingDetails() {
               <Calendar className="size-4 text-muted-foreground" />
               <div>
                 <div className="text-xs text-muted-foreground">Создано</div>
-                <div className="font-medium">{format(new Date(booking.createdAt), "dd.MM.yyyy HH:mm", { locale: ru })}</div>
+                <div className="font-medium">{formatInTimeZone(booking.createdAt, owner?.timezone ?? "UTC", "dd.MM.yyyy HH:mm")}</div>
               </div>
             </div>
             {booking.notes && (

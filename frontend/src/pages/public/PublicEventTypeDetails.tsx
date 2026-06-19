@@ -7,6 +7,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import { format, addDays, startOfDay, endOfDay, startOfToday } from "date-fns";
 import { ru } from "date-fns/locale";
+import { formatInTimeZone } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -253,7 +254,7 @@ export function PublicEventTypeDetails() {
                       >
                         <Circle className="size-2 fill-green-500 text-green-500" />
                         <span className="text-sm font-medium">
-                          {format(new Date(slot.startTime), "HH:mm")}
+                          {formatInTimeZone(slot.startTime, owner.timezone, "HH:mm")}
                         </span>
                       </Button>
                     ))
@@ -284,8 +285,9 @@ export function PublicEventTypeDetails() {
                   </h2>
                   <p className="text-sm text-muted-foreground">
                     {selectedSlot
-                      ? `${format(selectedDate, "EEEE, d MMMM", { locale: ru })} в ${format(
-                          new Date(selectedSlot.startTime),
+                      ? `${format(selectedDate, "EEEE, d MMMM", { locale: ru })} в ${formatInTimeZone(
+                          selectedSlot.startTime,
+                          owner.timezone,
                           "HH:mm"
                         )}`
                       : ""}
