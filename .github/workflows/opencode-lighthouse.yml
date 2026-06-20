@@ -29,6 +29,25 @@ jobs:
         with:
           persist-credentials: false
 
+      # Бесплатный тариф Render переводит сервер в сон после простоя.
+      # Ждём ответа 200 перед запуском Lighthouse, чтобы избежать ошибки 503 при холодном старте.
+      - name: Wake up Render instance
+        run: |
+          echo "Warming up $TARGET_URL ..."
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$TARGET_URL")
+            echo "Attempt $i: HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              echo "Server is up."
+              break
+            fi
+            if [ "$i" = "12" ]; then
+              echo "Server did not respond with 200 after 2 minutes."
+              exit 1
+            fi
+            sleep 10
+          done
+
       - name: Run Lighthouse
         run: |
           npx lighthouse "$TARGET_URL" \
