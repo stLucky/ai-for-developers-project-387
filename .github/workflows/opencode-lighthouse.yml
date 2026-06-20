@@ -1,0 +1,63 @@
+name: opencode-lighthouse
+on:
+  schedule:
+    - cron: '0 1 * * *' # Every day at 01:00 UTC (night run, report ready by morning)
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL to audit with Lighthouse'
+        required: false
+        type: string
+      model:
+        description: 'Model to use for OpenCode analysis'
+        required: false
+        default: 'opencode/kimi-k2.6'
+        type: string
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      id-token: write
+      contents: read
+      issues: write
+    env:
+      TARGET_URL: ${{ github.event.inputs.url || vars.LIGHTHOUSE_URL || 'https://ai-for-developers-project-387-qhdc.onrender.com/' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run Lighthouse
+        run: |
+          npx lighthouse "$TARGET_URL" \
+            --output=json --output=html \
+            --output-path=./lighthouse-report \
+            --chrome-flags="--headless=new --no-sandbox" \
+            --quiet
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report-${{ github.run_number }}
+          path: lighthouse-report.report.*
+          retention-days: 30
+
+      - name: Analyze with OpenCode
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        with:
+          model: ${{ github.event.inputs.model || 'opencode/kimi-k2.6' }}
+          prompt: |
+            Read the Lighthouse report JSON at ./lighthouse-report.report.json.
+            Extract: Largest Contentful Paint (LCP), Cumulative Layout Shift (CLS),
+            Total Blocking Time (TBT, lab proxy for INP), and the overall performance score.
+            Compare against the "good" thresholds: LCP < 2.5s, CLS < 0.1, TBT < 200ms,
+            performance score >= 0.9.
+            For each metric that exceeds its threshold, identify likely culprits in the
+            frontend code and recent commits, and open ONE GitHub issue summarizing the
+            failing metrics with specific, actionable recommendations and file references.
+            If all metrics pass, do not open an issue.
