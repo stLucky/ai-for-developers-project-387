@@ -6,13 +6,27 @@ on:
   pull_request_review_comment:
     types: [created]
 
+# Предотвращает параллельные запуски агента на одном и том же issue/PR.
+# cancel-in-progress: false — новый запуск ждёт завершения текущего,
+# а не обрывает агента в середине работы (например, в момент создания PR).
+concurrency:
+  group: opencode-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: false
+
 jobs:
   opencode:
     if: |
-      contains(github.event.comment.body, ' /oc') ||
-      startsWith(github.event.comment.body, '/oc') ||
-      contains(github.event.comment.body, ' /opencode') ||
-      startsWith(github.event.comment.body, '/opencode')
+      github.event.comment.user.type != 'Bot' &&
+      (github.event.comment.author_association == 'OWNER' ||
+       github.event.comment.author_association == 'MEMBER' ||
+       github.event.comment.author_association == 'COLLABORATOR') &&
+      (contains(github.event.comment.body, ' /oc') ||
+       startsWith(github.event.comment.body, '/oc') ||
+       contains(github.event.comment.body, ' /opencode') ||
+       startsWith(github.event.comment.body, '/opencode'))
+    # user.type != 'Bot' — агент не реагирует на собственные и чужие бот-комментарии (защита от зацикливания).
+    # author_association — агента могут вызвать только владелец, участник или внешний соавтор репозитория;
+    # посторонние в публичном репозитории не расходуют платный API-бюджет.
     runs-on: ubuntu-latest
     permissions:
       id-token: write

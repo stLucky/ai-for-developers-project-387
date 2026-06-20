@@ -6,6 +6,11 @@ on:
   push:
     branches: [master]
 
+# CI только запускает тесты и type-check — доступ на запись не нужен.
+# Явное ограничение прав минимизирует риск в случае компрометации workflow или зависимостей.
+permissions:
+  contents: read
+
 jobs:
   ci:
     timeout-minutes: 15
