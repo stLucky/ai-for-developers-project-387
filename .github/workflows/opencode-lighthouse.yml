@@ -1,7 +1,7 @@
 name: opencode-lighthouse
 on:
-  schedule:
-    - cron: '0 1 * * *' # Every day at 01:00 UTC (night run, report ready by morning)
+  # schedule:
+  #   - cron: '0 1 * * *' # Every day at 01:00 UTC (night run, report ready by morning)
   workflow_dispatch:
     inputs:
       url:
