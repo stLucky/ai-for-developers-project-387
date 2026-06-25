@@ -1,6 +1,6 @@
 {
   "name": "call-booking",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "TypeSpec specification for Call Booking service",
   "scripts": {
     "prism": "prism mock tsp-output/@typespec/openapi3/openapi.yaml --port 4010",
