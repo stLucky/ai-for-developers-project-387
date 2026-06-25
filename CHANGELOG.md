@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.0 (2026-06-25)
+
+
+### Features
+
+* scaffold call booking service with API spec, backend and frontend ([4b7bd52](https://github.com/stLucky/ai-for-developers-project-387/commit/4b7bd52956fefb5b767f347f90755840febdedf9))
+
+
+### Bug Fixes
+
+* **booking:** display slot times in owner's timezone instead of local browser time ([c991677](https://github.com/stLucky/ai-for-developers-project-387/commit/c991677badc9290bee81d04c89dd7e80cae803c8))
+* Fixed slot generation timezone bug. ([2b60575](https://github.com/stLucky/ai-for-developers-project-387/commit/2b60575daf7ddd13fd4af289d4634aee34fc6db4))
+
 ## [1.1.0](https://github.com/stLucky/ai-for-developers-project-386/compare/v1.0.0...v1.1.0) (2026-06-16)
 
 
